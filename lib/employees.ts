@@ -1,8 +1,12 @@
 import { supabase } from "@/lib/supabase";
 import type {
+  EmployeeRow,
   EmployeeWithManager,
   NewEmployee,
 } from "@/lib/types/employee";
+
+const EMPLOYEE_ROW_SELECT =
+  "id, clerk_user_id, full_name, email, designation, department, date_of_joining, manager_id, role, is_active, created_at";
 
 const EMPLOYEE_SELECT = `
   id,
@@ -43,6 +47,41 @@ export async function createEmployee(input: NewEmployee): Promise<void> {
     role: input.role,
     is_active: input.is_active,
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+function escapeIlike(value: string) {
+  return value.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
+}
+
+export async function findEmployeeByEmail(
+  email: string,
+): Promise<EmployeeRow | null> {
+  const { data, error } = await supabase
+    .from("employees")
+    .select(EMPLOYEE_ROW_SELECT)
+    .ilike("email", escapeIlike(email.trim()))
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as EmployeeRow | null) ?? null;
+}
+
+export async function linkEmployeeClerkUserId(
+  employeeId: string,
+  clerkUserId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("employees")
+    .update({ clerk_user_id: clerkUserId })
+    .eq("id", employeeId)
+    .is("clerk_user_id", null);
 
   if (error) {
     throw new Error(error.message);

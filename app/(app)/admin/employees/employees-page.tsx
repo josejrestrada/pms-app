@@ -46,18 +46,8 @@ export function EmployeesPage() {
   }, [fetchEmployees]);
 
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
-      <header className="border-b border-zinc-200 dark:border-zinc-800">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
-          <span className="text-sm font-semibold tracking-tight">Merit</span>
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">
-            Admin
-          </span>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Employees</h1>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
@@ -156,7 +146,6 @@ export function EmployeesPage() {
             </tbody>
           </table>
         </div>
-      </main>
 
       <AddEmployeeModal
         open={modalOpen}
@@ -164,6 +153,6 @@ export function EmployeesPage() {
         onClose={() => setModalOpen(false)}
         onCreated={() => fetchEmployees(false)}
       />
-    </div>
+    </>
   );
 }

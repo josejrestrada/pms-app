@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Show } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Merit",
@@ -30,12 +31,24 @@ export default function Home() {
       <header className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6">
           <span className="text-sm font-semibold tracking-tight">Merit</span>
-          <Link
-            href="/sign-in"
-            className="rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            Sign In
-          </Link>
+          <div>
+            <Show when="signed-out">
+              <Link
+                href="/sign-in"
+                className="rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Sign In
+              </Link>
+            </Show>
+            <Show when="signed-in">
+              <Link
+                href="/dashboard"
+                className="rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Open app
+              </Link>
+            </Show>
+          </div>
         </div>
       </header>
 
