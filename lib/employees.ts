@@ -23,6 +23,16 @@ const EMPLOYEE_SELECT = `
   manager:manager_id ( full_name )
 `;
 
+type ManagerEmbed = { full_name: string } | { full_name: string }[] | null;
+
+function normalizeManager(manager: ManagerEmbed): { full_name: string } | null {
+  if (!manager) {
+    return null;
+  }
+
+  return Array.isArray(manager) ? (manager[0] ?? null) : manager;
+}
+
 export async function listEmployees(): Promise<EmployeeWithManager[]> {
   const { data, error } = await supabase
     .from("employees")
@@ -33,7 +43,10 @@ export async function listEmployees(): Promise<EmployeeWithManager[]> {
     throw new Error(error.message);
   }
 
-  return (data ?? []) as EmployeeWithManager[];
+  return (data ?? []).map((row) => ({
+    ...(row as unknown as EmployeeRow),
+    manager: normalizeManager(row.manager),
+  }));
 }
 
 export async function createEmployee(input: NewEmployee): Promise<void> {
