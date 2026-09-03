@@ -1,15 +1,16 @@
 import { supabase } from "@/lib/supabase";
 import type {
+  CompleteManagerReviewInput,
   GoalRatingRow,
   ReviewRow,
   SelfAppraisalInput,
 } from "@/lib/types/review";
 
 const REVIEW_SELECT =
-  "id, employee_id, cycle_id, status, overall_self_rating, self_summary, submitted_at, created_at";
+  "id, employee_id, cycle_id, status, overall_self_rating, self_summary, overall_manager_rating, manager_summary, submitted_at, reviewed_at, created_at";
 
 const GOAL_RATING_SELECT =
-  "id, review_id, goal_id, self_comment, self_rating";
+  "id, review_id, goal_id, self_comment, self_rating, manager_comment, manager_rating";
 
 export async function getEmployeeCycleReview(
   employeeId: string,
@@ -27,6 +28,41 @@ export async function getEmployeeCycleReview(
   }
 
   return (data as ReviewRow | null) ?? null;
+}
+
+export async function getReviewById(id: string): Promise<ReviewRow | null> {
+  const { data, error } = await supabase
+    .from("reviews")
+    .select(REVIEW_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as ReviewRow | null) ?? null;
+}
+
+export async function listReviewsForEmployees(
+  employeeIds: string[],
+): Promise<ReviewRow[]> {
+  if (employeeIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("reviews")
+    .select(REVIEW_SELECT)
+    .in("employee_id", employeeIds)
+    .in("status", ["self_submitted", "completed"])
+    .order("submitted_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as ReviewRow[];
 }
 
 export async function listGoalRatings(
@@ -109,5 +145,37 @@ export async function submitSelfAppraisal(
 
   if (ratingsError) {
     throw new Error(ratingsError.message);
+  }
+}
+
+export async function completeManagerReview(
+  input: CompleteManagerReviewInput,
+): Promise<void> {
+  for (const rating of input.ratings) {
+    const { error } = await supabase
+      .from("goal_ratings")
+      .update({
+        manager_comment: rating.manager_comment,
+        manager_rating: rating.manager_rating,
+      })
+      .eq("id", rating.id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  const { error } = await supabase
+    .from("reviews")
+    .update({
+      overall_manager_rating: input.overall_manager_rating,
+      manager_summary: input.manager_summary,
+      status: "completed",
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", input.review_id);
+
+  if (error) {
+    throw new Error(error.message);
   }
 }
