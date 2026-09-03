@@ -37,6 +37,25 @@ export async function createGoal(input: NewGoal): Promise<void> {
   }
 }
 
+export async function updateGoal(
+  id: string,
+  input: Pick<NewGoal, "title" | "description" | "weightage" | "target_date">,
+): Promise<void> {
+  const { error } = await supabase
+    .from("goals")
+    .update({
+      title: input.title,
+      description: input.description,
+      weightage: input.weightage,
+      target_date: input.target_date,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function submitDraftGoals(
   employeeId: string,
   cycleId: string,

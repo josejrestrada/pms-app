@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useEmployee } from "@/components/employee-provider";
-import { createGoal, listEmployeeGoals, submitDraftGoals } from "@/lib/goals";
+import {
+  createGoal,
+  listEmployeeGoals,
+  submitDraftGoals,
+  updateGoal,
+} from "@/lib/goals";
 import { getOpenReviewCycle } from "@/lib/review-cycles";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
@@ -47,6 +52,7 @@ export function GoalsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [weightage, setWeightage] = useState("");
@@ -99,7 +105,25 @@ export function GoalsPage() {
     void loadOpenCycle();
   }, [loadOpenCycle]);
 
-  async function handleAddGoal(event: FormEvent<HTMLFormElement>) {
+  function resetForm() {
+    setEditingGoalId(null);
+    setTitle("");
+    setDescription("");
+    setWeightage("");
+    setTargetDate("");
+    setFormError(null);
+  }
+
+  function startEdit(goal: GoalRow) {
+    setEditingGoalId(goal.id);
+    setTitle(goal.title);
+    setDescription(goal.description ?? "");
+    setWeightage(goal.weightage != null ? String(goal.weightage) : "");
+    setTargetDate(goal.target_date ?? "");
+    setFormError(null);
+  }
+
+  async function handleSaveGoal(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!cycleId) {
       return;
@@ -116,7 +140,12 @@ export function GoalsPage() {
       return;
     }
 
-    if (targetDate < todayDateInputValue()) {
+    const today = todayDateInputValue();
+    const editingGoal = goals.find((goal) => goal.id === editingGoalId);
+    const keepingExistingPastDate =
+      editingGoal?.target_date === targetDate && targetDate < today;
+
+    if (targetDate < today && !keepingExistingPastDate) {
       setFormError("Target date cannot be in the past.");
       return;
     }
@@ -125,21 +154,26 @@ export function GoalsPage() {
     setFormError(null);
     setError(null);
 
+    const payload = {
+      title: title.trim(),
+      description: description.trim() || null,
+      weightage: parsedWeightage,
+      target_date: targetDate,
+    };
+
     try {
-      await createGoal({
-        employee_id: employee.id,
-        cycle_id: cycleId,
-        title: title.trim(),
-        description: description.trim() || null,
-        weightage: parsedWeightage,
-        target_date: targetDate,
-      });
+      if (editingGoalId) {
+        await updateGoal(editingGoalId, payload);
+      } else {
+        await createGoal({
+          employee_id: employee.id,
+          cycle_id: cycleId,
+          ...payload,
+        });
+      }
       const rows = await listEmployeeGoals(employee.id, cycleId);
       setGoals(rows);
-      setTitle("");
-      setDescription("");
-      setWeightage("");
-      setTargetDate("");
+      resetForm();
     } catch (submitError) {
       setError(
         submitError instanceof Error
@@ -205,20 +239,23 @@ export function GoalsPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="w-full rounded-xl border border-zinc-200 bg-white px-8 py-16 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Goals locked
-          </p>
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight">
             No Active Review Cycle
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Performance goal setting is currently locked because HR has not
-            opened a review cycle.
+            Goal setting is currently locked.
           </p>
         </div>
       </div>
     );
   }
+
+  const today = todayDateInputValue();
+  const editingGoal = goals.find((goal) => goal.id === editingGoalId);
+  const minTargetDate =
+    editingGoal?.target_date && editingGoal.target_date < today
+      ? editingGoal.target_date
+      : today;
 
   return (
     <div className="space-y-8">
@@ -262,12 +299,14 @@ export function GoalsPage() {
       ) : null}
 
       <section className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="text-lg font-semibold tracking-tight">Add a goal</h2>
+        <h2 className="text-lg font-semibold tracking-tight">
+          {editingGoalId ? "Edit goal" : "Add a goal"}
+        </h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Goals you add are saved to this review cycle.
+          Goals you save are stored against this review cycle.
         </p>
 
-        <form className="mt-5 grid gap-4" onSubmit={handleAddGoal}>
+        <form className="mt-5 grid gap-4" onSubmit={handleSaveGoal}>
           <label className="block text-sm font-medium">
             Title
             <input
@@ -309,7 +348,7 @@ export function GoalsPage() {
               <input
                 required
                 type="date"
-                min={todayDateInputValue()}
+                min={minTargetDate}
                 className={fieldClassName}
                 value={targetDate}
                 onChange={(event) => setTargetDate(event.target.value)}
@@ -323,13 +362,26 @@ export function GoalsPage() {
             </p>
           ) : null}
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            {editingGoalId ? (
+              <button
+                type="button"
+                className="rounded-md border border-zinc-300 px-3.5 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                onClick={resetForm}
+              >
+                Cancel
+              </button>
+            ) : null}
             <button
               type="submit"
               disabled={savingGoal}
               className="rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              {savingGoal ? "Saving…" : "Add goal"}
+              {savingGoal
+                ? "Saving…"
+                : editingGoalId
+                  ? "Save goal"
+                  : "Add goal"}
             </button>
           </div>
         </form>
@@ -364,20 +416,34 @@ export function GoalsPage() {
         ) : (
           <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {goals.map((goal) => (
-              <li key={goal.id} className="px-6 py-4">
-                <p className="font-medium">{goal.title}</p>
-                {goal.description ? (
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    {goal.description}
+              <li
+                key={goal.id}
+                className="flex items-start justify-between gap-4 px-6 py-4"
+              >
+                <div>
+                  <p className="font-medium">{goal.title}</p>
+                  {goal.description ? (
+                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                      {goal.description}
+                    </p>
+                  ) : null}
+                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    {goal.weightage != null ? `${goal.weightage}% · ` : null}
+                    {goal.target_date
+                      ? `Due ${formatDate(goal.target_date)} · `
+                      : null}
+                    {goal.status}
                   </p>
+                </div>
+                {goal.status === "draft" ? (
+                  <button
+                    type="button"
+                    className="shrink-0 text-sm font-medium text-zinc-700 underline-offset-2 hover:underline dark:text-zinc-300"
+                    onClick={() => startEdit(goal)}
+                  >
+                    Edit
+                  </button>
                 ) : null}
-                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  {goal.weightage != null ? `${goal.weightage}% · ` : null}
-                  {goal.target_date
-                    ? `Due ${formatDate(goal.target_date)} · `
-                    : null}
-                  {goal.status}
-                </p>
               </li>
             ))}
           </ul>
@@ -396,8 +462,7 @@ export function GoalsPage() {
             : "Submit Goals for Approval"}
         </button>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          Total weightage of all goals must equal 100% before submitting for
-          manager approval.
+          Total weightage must equal 100% to submit.
         </p>
       </section>
     </div>
