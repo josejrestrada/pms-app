@@ -33,6 +33,23 @@ function normalizeManager(manager: ManagerEmbed): { full_name: string } | null {
   return Array.isArray(manager) ? (manager[0] ?? null) : manager;
 }
 
+export async function listDirectReports(
+  managerId: string,
+): Promise<EmployeeRow[]> {
+  const { data, error } = await supabase
+    .from("employees")
+    .select(EMPLOYEE_ROW_SELECT)
+    .eq("manager_id", managerId)
+    .eq("is_active", true)
+    .order("full_name", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as EmployeeRow[];
+}
+
 export async function listEmployees(): Promise<EmployeeWithManager[]> {
   const { data, error } = await supabase
     .from("employees")
