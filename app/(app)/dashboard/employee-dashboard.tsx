@@ -13,6 +13,7 @@ import { getEmployeeCycleReview } from "@/lib/reviews";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewRow } from "@/lib/types/review";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
+import { EmptyState, PageSkeleton } from "@/components/empty-state";
 import { StatusBadge } from "./status-badge";
 
 const actionClassName =
@@ -64,12 +65,7 @@ export function EmployeeDashboard() {
   }, [load]);
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-28 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        <div className="h-24 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   const status = cycleProgressStatus(goals, review);
@@ -131,7 +127,12 @@ export function EmployeeDashboard() {
             </Link>
           ) : null}
         </section>
-      ) : null}
+      ) : (
+        <EmptyState
+          title="No active review cycle"
+          description="Goal setting and self-appraisal stay locked until HR opens a cycle."
+        />
+      )}
     </div>
   );
 }

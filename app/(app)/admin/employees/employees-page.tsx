@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { listEmployees } from "@/lib/employees";
 import type { EmployeeRole, EmployeeWithManager } from "@/lib/types/employee";
+import { EmptyState } from "@/components/empty-state";
 import { AddEmployeeModal } from "./add-employee-modal";
 
 const ROLE_LABELS: Record<EmployeeRole, string> = {
@@ -104,11 +105,15 @@ export function EmployeesPage() {
                 ))
               ) : employees.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-16 text-center">
-                    <p className="font-medium">No employees yet</p>
-                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                      Add the first person to start building your directory.
-                    </p>
+                  <td colSpan={6} className="px-4 py-8">
+                    <EmptyState
+                      title="No employees yet"
+                      description="Add the first person to start building your directory and reporting hierarchy."
+                      action={{
+                        label: "Add employee",
+                        onClick: () => setModalOpen(true),
+                      }}
+                    />
                   </td>
                 </tr>
               ) : (

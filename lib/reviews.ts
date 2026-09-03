@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { findEmployeeById } from "@/lib/employees";
 import type {
   CompleteManagerReviewInput,
   GoalRatingRow,
@@ -171,7 +172,18 @@ export async function submitSelfAppraisal(
 
 export async function completeManagerReview(
   input: CompleteManagerReviewInput,
+  actorId: string,
 ): Promise<void> {
+  const review = await getReviewById(input.review_id);
+  if (!review) {
+    throw new Error("Unauthorized");
+  }
+
+  const subject = await findEmployeeById(review.employee_id);
+  if (!subject || subject.manager_id !== actorId) {
+    throw new Error("Unauthorized");
+  }
+
   for (const rating of input.ratings) {
     const { error } = await supabase
       .from("goal_ratings")

@@ -14,6 +14,7 @@ import type { EmployeeRow } from "@/lib/types/employee";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewRow } from "@/lib/types/review";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
+import { EmptyState, PageSkeleton } from "@/components/empty-state";
 
 type DepartmentRow = {
   department: string;
@@ -188,16 +189,7 @@ export function HrAdminDashboard() {
   }
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="h-24 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-          <div className="h-24 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-          <div className="h-24 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        </div>
-        <div className="h-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-    );
+    return <PageSkeleton variant="metrics" />;
   }
 
   return (
@@ -223,6 +215,14 @@ export function HrAdminDashboard() {
         <MetricCard label="Active Cycle" value={cycle?.name ?? "None"} />
         <MetricCard label="Completion Rate" value={`${metrics.rate}%`} />
       </section>
+
+      {!cycle ? (
+        <EmptyState
+          title="No active review cycle"
+          description="Open a cycle so employees can set goals and complete appraisals. Completion rate stays at 0% until a cycle is active."
+          action={{ href: "/admin/cycles", label: "Manage cycles" }}
+        />
+      ) : null}
 
       <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between gap-4 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
@@ -251,11 +251,12 @@ export function HrAdminDashboard() {
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {departments.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-10 text-center text-zinc-600 dark:text-zinc-400"
-                  >
-                    No employees yet.
+                  <td colSpan={5} className="px-4 py-10">
+                    <EmptyState
+                      title="No employees yet"
+                      description="Add people in the employee directory so cycle completion can be tracked by department."
+                      action={{ href: "/admin/employees", label: "Add employees" }}
+                    />
                   </td>
                 </tr>
               ) : (

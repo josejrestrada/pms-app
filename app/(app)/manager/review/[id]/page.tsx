@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireManagerReviewAccess } from "@/lib/authz";
 import { ManagerReviewPage } from "./manager-review-page";
 
 export const metadata: Metadata = {
@@ -12,5 +13,6 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireManagerReviewAccess(id);
   return <ManagerReviewPage reviewId={id} />;
 }

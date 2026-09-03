@@ -9,6 +9,7 @@ import {
   listGoalRatings,
   submitSelfAppraisal,
 } from "@/lib/reviews";
+import { EmptyState, PageSkeleton } from "@/components/empty-state";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
 
@@ -212,26 +213,16 @@ export function SelfAppraisalPage() {
   }
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-28 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        <div className="h-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   if (!openCycle) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="w-full rounded-xl border border-zinc-200 bg-white px-8 py-16 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            No Active Review Cycle
-          </h1>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Self-appraisal is currently locked.
-          </p>
-        </div>
-      </div>
+      <EmptyState
+        title="No Active Review Cycle"
+        description="Self-appraisal is currently locked. Return here after HR opens a cycle and your goals are approved."
+        action={{ href: "/dashboard", label: "Back to dashboard" }}
+      />
     );
   }
 
@@ -269,10 +260,11 @@ export function SelfAppraisalPage() {
       ) : null}
 
       {goals.length === 0 ? (
-        <p className="rounded-lg border border-zinc-200 bg-white px-6 py-10 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          You have no approved goals for this cycle yet. Self-appraisal opens
-          after your manager approves your goals.
-        </p>
+        <EmptyState
+          title="No approved goals yet"
+          description="Self-appraisal opens after your manager approves your goals for this cycle."
+          action={{ href: "/goals", label: "Go to my goals" }}
+        />
       ) : (
         <form className="space-y-6" onSubmit={handleSubmit}>
           {goals.map((goal) => (

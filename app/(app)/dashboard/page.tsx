@@ -6,6 +6,15 @@ export const metadata: Metadata = {
   description: "Role-aware performance cycle status and actions.",
 };
 
-export default function Page() {
-  return <DashboardPage />;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ alert?: string | string[] }>;
+}) {
+  const alert = (await searchParams).alert;
+  const unauthorized = Array.isArray(alert)
+    ? alert.includes("unauthorized")
+    : alert === "unauthorized";
+
+  return <DashboardPage unauthorized={unauthorized} />;
 }

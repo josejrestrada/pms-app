@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEmployee } from "@/components/employee-provider";
 import { findEmployeeById } from "@/lib/employees";
 import { listApprovedEmployeeGoals } from "@/lib/goals";
@@ -11,6 +11,7 @@ import {
   getReviewById,
   listGoalRatings,
 } from "@/lib/reviews";
+import { EmptyState, PageSkeleton } from "@/components/empty-state";
 import type { EmployeeRow } from "@/lib/types/employee";
 import type { GoalRow } from "@/lib/types/goal";
 import type { GoalRatingRow, ReviewRow } from "@/lib/types/review";
@@ -45,6 +46,7 @@ function formatDate(isoDate: string) {
 
 export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
   const manager = useEmployee();
+  const router = useRouter();
   const [review, setReview] = useState<ReviewRow | null>(null);
   const [report, setReport] = useState<EmployeeRow | null>(null);
   const [cycle, setCycle] = useState<ReviewCycleRow | null>(null);
@@ -58,14 +60,12 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [forbidden, setForbidden] = useState(false);
 
   const load = useCallback(async (showLoading = true) => {
     if (showLoading) {
       setLoading(true);
     }
     setError(null);
-    setForbidden(false);
 
     try {
       const row = await getReviewById(reviewId);
@@ -76,8 +76,7 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
 
       const employee = await findEmployeeById(row.employee_id);
       if (!employee || employee.manager_id !== manager.id) {
-        setForbidden(true);
-        setReview(null);
+        router.replace("/dashboard?alert=unauthorized");
         return;
       }
 
@@ -117,7 +116,7 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [manager.id, reviewId]);
+  }, [manager.id, reviewId, router]);
 
   useEffect(() => {
     void load();
@@ -179,12 +178,15 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
     setSuccess(null);
 
     try {
-      await completeManagerReview({
-        review_id: review.id,
-        overall_manager_rating: overall,
-        manager_summary: managerSummary.trim(),
-        ratings: nextRatings,
-      });
+      await completeManagerReview(
+        {
+          review_id: review.id,
+          overall_manager_rating: overall,
+          manager_summary: managerSummary.trim(),
+          ratings: nextRatings,
+        },
+        manager.id,
+      );
       setSuccess("Review completed.");
       await load(false);
     } catch (submitError) {
@@ -199,46 +201,16 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
   }
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-28 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        <div className="h-64 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-    );
-  }
-
-  if (forbidden) {
-    return (
-      <div className="rounded-lg border border-zinc-200 bg-white px-6 py-10 text-center dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Review not available
-        </h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          You can only complete reviews for your direct reports.
-        </p>
-        <Link
-          href="/manager/review"
-          className="mt-4 inline-block text-sm font-medium underline-offset-2 hover:underline"
-        >
-          Back to team reviews
-        </Link>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   if (!review || !report) {
     return (
-      <div className="rounded-lg border border-zinc-200 bg-white px-6 py-10 text-center dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Review not found
-        </h1>
-        <Link
-          href="/manager/review"
-          className="mt-4 inline-block text-sm font-medium underline-offset-2 hover:underline"
-        >
-          Back to team reviews
-        </Link>
-      </div>
+      <EmptyState
+        title="Review not found"
+        description="This review may have been removed, or you may not have access to it."
+        action={{ href: "/manager/review", label: "Back to team reviews" }}
+      />
     );
   }
 
@@ -283,10 +255,11 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
       ) : null}
 
       {!canComplete ? (
-        <p className="rounded-lg border border-zinc-200 bg-white px-6 py-8 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          This review is not ready. The employee must submit a self-appraisal
-          first.
-        </p>
+        <EmptyState
+          title="Review not ready"
+          description="The employee must submit a self-appraisal before you can complete this review."
+          action={{ href: "/manager/review", label: "Back to team reviews" }}
+        />
       ) : (
         <form className="space-y-6" onSubmit={handleSubmit}>
           {ratings.map((rating) => {

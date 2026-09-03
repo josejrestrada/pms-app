@@ -6,6 +6,7 @@ import type {
   ReviewCycleRow,
   ReviewCycleStatus,
 } from "@/lib/types/review-cycle";
+import { EmptyState } from "@/components/empty-state";
 import { CreateCycleModal } from "./create-cycle-modal";
 
 const STATUS_STYLES: Record<ReviewCycleStatus, string> = {
@@ -151,11 +152,15 @@ export function CyclesPage() {
                 ))
               ) : cycles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-16 text-center">
-                    <p className="font-medium">No review cycles yet</p>
-                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                      Create a cycle to start a performance review period.
-                    </p>
+                  <td colSpan={5} className="px-4 py-8">
+                    <EmptyState
+                      title="No review cycles yet"
+                      description="Create a cycle to start a performance review period for the company."
+                      action={{
+                        label: "Create cycle",
+                        onClick: () => setModalOpen(true),
+                      }}
+                    />
                   </td>
                 </tr>
               ) : (

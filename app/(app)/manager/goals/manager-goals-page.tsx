@@ -12,6 +12,7 @@ import { getOpenReviewCycle } from "@/lib/review-cycles";
 import type { EmployeeRow } from "@/lib/types/employee";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
+import { EmptyState, PageSkeleton } from "@/components/empty-state";
 import { SendBackModal } from "./send-back-modal";
 
 function formatDate(isoDate: string) {
@@ -179,26 +180,16 @@ export function ManagerGoalsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-28 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        <div className="h-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   if (!openCycle) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="w-full rounded-xl border border-zinc-200 bg-white px-8 py-16 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            No Active Review Cycle
-          </h1>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Goal review is currently locked.
-          </p>
-        </div>
-      </div>
+      <EmptyState
+        title="No Active Review Cycle"
+        description="Goal review is currently locked. Open the dashboard until HR starts a cycle."
+        action={{ href: "/dashboard", label: "Back to dashboard" }}
+      />
     );
   }
 
@@ -235,9 +226,11 @@ export function ManagerGoalsPage() {
       ) : null}
 
       {reports.length === 0 ? (
-        <p className="rounded-lg border border-zinc-200 bg-white px-6 py-10 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          You have no direct reports yet.
-        </p>
+        <EmptyState
+          title="No direct reports"
+          description="You do not have anyone assigned to you yet, so there are no goals to approve."
+          action={{ href: "/dashboard", label: "Back to dashboard" }}
+        />
       ) : (
         <div className="space-y-6">
           {reports.map((report) => {

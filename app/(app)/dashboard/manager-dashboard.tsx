@@ -16,6 +16,7 @@ import type { EmployeeRow } from "@/lib/types/employee";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewRow } from "@/lib/types/review";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
+import { EmptyState, PageSkeleton } from "@/components/empty-state";
 import { StatusBadge } from "./status-badge";
 
 export function ManagerDashboard() {
@@ -96,12 +97,7 @@ export function ManagerDashboard() {
   }, [goals, reports, reviews]);
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-20 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        <div className="h-40 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   return (
@@ -128,10 +124,16 @@ export function ManagerDashboard() {
           : "No active review cycle. Team actions are locked."}
       </p>
 
-      {reports.length === 0 ? (
-        <p className="rounded-lg border border-zinc-200 bg-white px-6 py-10 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          You have no direct reports yet.
-        </p>
+      {!cycle ? (
+        <EmptyState
+          title="No active review cycle"
+          description="Team goal approval and reviews stay locked until HR opens a cycle."
+        />
+      ) : reports.length === 0 ? (
+        <EmptyState
+          title="No direct reports"
+          description="When HR assigns people to you, they will show up here with goal and review status."
+        />
       ) : (
         <ul className="divide-y divide-zinc-200 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
           {rows.map(({ report, status, review }) => (

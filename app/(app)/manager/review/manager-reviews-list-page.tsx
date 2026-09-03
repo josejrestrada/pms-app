@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useEmployee } from "@/components/employee-provider";
+import { EmptyState, PageSkeleton } from "@/components/empty-state";
 import { listDirectReports } from "@/lib/employees";
 import { listReviewsForEmployees } from "@/lib/reviews";
 import type { EmployeeRow } from "@/lib/types/employee";
@@ -56,12 +57,7 @@ export function ManagerReviewsListPage() {
   }, [load]);
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-20 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        <div className="h-40 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   return (
@@ -90,9 +86,11 @@ export function ManagerReviewsListPage() {
       ) : null}
 
       {reviews.length === 0 ? (
-        <p className="rounded-lg border border-zinc-200 bg-white px-6 py-10 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          No submitted self-appraisals yet.
-        </p>
+        <EmptyState
+          title="No reviews to complete"
+          description="When a direct report submits a self-appraisal, it will appear here so you can complete the manager review."
+          action={{ href: "/manager/goals", label: "Review team goals" }}
+        />
       ) : (
         <ul className="divide-y divide-zinc-200 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
           {reviews.map((review) => {
