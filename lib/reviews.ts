@@ -65,6 +65,27 @@ export async function listReviewsForEmployees(
   return (data ?? []) as ReviewRow[];
 }
 
+export async function listEmployeeReviewsForCycle(
+  employeeIds: string[],
+  cycleId: string,
+): Promise<ReviewRow[]> {
+  if (employeeIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("reviews")
+    .select(REVIEW_SELECT)
+    .in("employee_id", employeeIds)
+    .eq("cycle_id", cycleId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as ReviewRow[];
+}
+
 export async function listGoalRatings(
   reviewId: string,
 ): Promise<GoalRatingRow[]> {

@@ -41,6 +41,28 @@ export async function listApprovedEmployeeGoals(
   return (data ?? []) as GoalRow[];
 }
 
+export async function listGoalsForEmployees(
+  employeeIds: string[],
+  cycleId: string,
+): Promise<GoalRow[]> {
+  if (employeeIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("goals")
+    .select(GOAL_SELECT)
+    .in("employee_id", employeeIds)
+    .eq("cycle_id", cycleId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as GoalRow[];
+}
+
 export async function createGoal(input: NewGoal): Promise<void> {
   const { error } = await supabase.from("goals").insert({
     employee_id: input.employee_id,
