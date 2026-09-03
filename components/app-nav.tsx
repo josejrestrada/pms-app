@@ -14,7 +14,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/my-goals", label: "My Goals" },
-  { href: "/my-review", label: "My Review" },
+  { href: "/review/self", label: "My Review" },
   { href: "/my-team", label: "My Team", roles: ["manager"] },
   { href: "/manager/goals", label: "Team Goals", roles: ["manager"] },
   { href: "/admin/employees", label: "Employees", roles: ["hr_admin"] },

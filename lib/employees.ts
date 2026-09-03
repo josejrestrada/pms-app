@@ -87,6 +87,22 @@ function escapeIlike(value: string) {
   return value.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
 }
 
+export async function findEmployeeById(
+  id: string,
+): Promise<EmployeeRow | null> {
+  const { data, error } = await supabase
+    .from("employees")
+    .select(EMPLOYEE_ROW_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as EmployeeRow | null) ?? null;
+}
+
 export async function findEmployeeByEmail(
   email: string,
 ): Promise<EmployeeRow | null> {
