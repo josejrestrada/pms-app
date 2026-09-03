@@ -5,6 +5,22 @@ import type {
   ReviewCycleStatus,
 } from "@/lib/types/review-cycle";
 
+export async function getOpenReviewCycle(): Promise<ReviewCycleRow | null> {
+  const { data, error } = await supabase
+    .from("review_cycles")
+    .select(
+      "id, name, start_date, end_date, status, created_by, created_at",
+    )
+    .eq("status", "open")
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as ReviewCycleRow | null) ?? null;
+}
+
 export async function listReviewCycles(): Promise<ReviewCycleRow[]> {
   const { data, error } = await supabase
     .from("review_cycles")
