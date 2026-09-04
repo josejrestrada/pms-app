@@ -14,13 +14,11 @@ import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewRow } from "@/lib/types/review";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
 import { EmptyState, PageSkeleton } from "@/components/empty-state";
+import { cardClassName, primaryButtonClassName, secondaryButtonClassName } from "@/lib/ui";
 import { StatusBadge } from "./status-badge";
 
-const actionClassName =
-  "inline-flex items-center justify-center rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200";
-
-const secondaryActionClassName =
-  "inline-flex items-center justify-center rounded-md border border-zinc-300 px-3.5 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800";
+const actionClassName = primaryButtonClassName;
+const secondaryActionClassName = secondaryButtonClassName;
 
 export function EmployeeDashboard() {
   const employee = useEmployee();
@@ -75,7 +73,7 @@ export function EmployeeDashboard() {
     <div className="space-y-6">
       {error ? (
         <div
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
           role="alert"
         >
           {error}
@@ -89,8 +87,8 @@ export function EmployeeDashboard() {
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <section className={cardClassName}>
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Active cycle
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -99,7 +97,7 @@ export function EmployeeDashboard() {
           </h2>
           <StatusBadge label={badge} />
         </div>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
           {cycle
             ? "Your review status for this cycle."
             : "Goal setting and self-appraisal are locked until HR opens a cycle."}

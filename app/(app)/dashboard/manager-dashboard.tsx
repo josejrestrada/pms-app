@@ -16,6 +16,7 @@ import type { EmployeeRow } from "@/lib/types/employee";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewRow } from "@/lib/types/review";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
+import { cardFlushClassName } from "@/lib/ui";
 import { EmptyState, PageSkeleton } from "@/components/empty-state";
 import { StatusBadge } from "./status-badge";
 
@@ -104,7 +105,7 @@ export function ManagerDashboard() {
     <div className="space-y-6">
       {error ? (
         <div
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
           role="alert"
         >
           {error}
@@ -118,7 +119,7 @@ export function ManagerDashboard() {
         </div>
       ) : null}
 
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-sm text-slate-600 dark:text-slate-400">
         {cycle
           ? `Team progress for ${cycle.name}.`
           : "No active review cycle. Team actions are locked."}
@@ -135,15 +136,15 @@ export function ManagerDashboard() {
           description="When HR assigns people to you, they will show up here with goal and review status."
         />
       ) : (
-        <ul className="divide-y divide-zinc-200 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
+        <ul className={`divide-y divide-slate-100 ${cardFlushClassName} dark:divide-slate-800`}>
           {rows.map(({ report, status, review }) => (
             <li
               key={report.id}
-              className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 px-6 py-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between dark:hover:bg-slate-800/40"
             >
               <div>
                 <p className="font-medium">{report.full_name}</p>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                   {report.designation}
                 </p>
               </div>
@@ -170,7 +171,7 @@ function QuickAction({
     return (
       <Link
         href="/manager/goals"
-        className="text-sm font-medium text-zinc-700 underline-offset-2 hover:underline dark:text-zinc-300"
+        className="text-sm font-medium text-indigo-600 underline-offset-2 hover:underline dark:text-indigo-400"
       >
         Approve goals
       </Link>
@@ -181,7 +182,7 @@ function QuickAction({
     return (
       <Link
         href={`/manager/review/${reviewId}`}
-        className="text-sm font-medium text-zinc-700 underline-offset-2 hover:underline dark:text-zinc-300"
+        className="text-sm font-medium text-indigo-600 underline-offset-2 hover:underline dark:text-indigo-400"
       >
         Complete review
       </Link>

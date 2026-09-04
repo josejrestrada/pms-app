@@ -14,6 +14,7 @@ import type { EmployeeRow } from "@/lib/types/employee";
 import type { GoalRow } from "@/lib/types/goal";
 import type { ReviewRow } from "@/lib/types/review";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
+import { cardClassName, cardFlushClassName, primaryButtonClassName, tableBodyClassName, tableHeadRowClassName, tableRowClassName } from "@/lib/ui";
 import { EmptyState, PageSkeleton } from "@/components/empty-state";
 
 type DepartmentRow = {
@@ -196,7 +197,7 @@ export function HrAdminDashboard() {
     <div className="space-y-8">
       {error ? (
         <div
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
           role="alert"
         >
           {error}
@@ -224,14 +225,14 @@ export function HrAdminDashboard() {
         />
       ) : null}
 
-      <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center justify-between gap-4 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
+      <section className={cardFlushClassName}>
+        <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-4 py-3 dark:border-slate-800">
           <h2 className="text-sm font-semibold tracking-tight">
             Department breakdown
           </h2>
           <button
             type="button"
-            className="rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className={primaryButtonClassName}
             onClick={exportCsv}
           >
             Export CSV
@@ -239,16 +240,16 @@ export function HrAdminDashboard() {
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+            <thead className={tableHeadRowClassName}>
               <tr>
-                <th className="px-4 py-3 font-medium">Department</th>
-                <th className="px-4 py-3 font-medium">Total</th>
-                <th className="px-4 py-3 font-medium">Pending Self-Appraisal</th>
-                <th className="px-4 py-3 font-medium">Pending Manager Review</th>
-                <th className="px-4 py-3 font-medium">Completed</th>
+                <th className="px-4 py-3">Department</th>
+                <th className="px-4 py-3">Total</th>
+                <th className="px-4 py-3">Pending Self-Appraisal</th>
+                <th className="px-4 py-3">Pending Manager Review</th>
+                <th className="px-4 py-3">Completed</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody className={tableBodyClassName}>
               {departments.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-10">
@@ -261,7 +262,7 @@ export function HrAdminDashboard() {
                 </tr>
               ) : (
                 departments.map((row) => (
-                  <tr key={row.department}>
+                  <tr key={row.department} className={tableRowClassName}>
                     <td className="px-4 py-3 font-medium">{row.department}</td>
                     <td className="px-4 py-3">{row.total}</td>
                     <td className="px-4 py-3">{row.pendingSelf}</td>
@@ -280,8 +281,8 @@ export function HrAdminDashboard() {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+    <div className={`${cardClassName} !p-4`}>
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
         {label}
       </p>
       <p className="mt-2 text-2xl font-semibold tracking-tight">{value}</p>

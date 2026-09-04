@@ -4,6 +4,7 @@ import { useEmployee } from "@/components/employee-provider";
 import { EmployeeDashboard } from "./employee-dashboard";
 import { HrAdminDashboard } from "./hr-admin-dashboard";
 import { ManagerDashboard } from "./manager-dashboard";
+import { PageHeader } from "@/components/page-header";
 import { UnauthorizedAlert } from "./unauthorized-alert";
 
 export function DashboardPage({ unauthorized }: { unauthorized: boolean }) {
@@ -12,12 +13,10 @@ export function DashboardPage({ unauthorized }: { unauthorized: boolean }) {
   return (
     <div className="space-y-6">
       <UnauthorizedAlert show={unauthorized} />
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Welcome back, {employee.full_name}.
-        </p>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        subtitle={`Welcome back, ${employee.full_name}.`}
+      />
 
       {employee.role === "hr_admin" ? (
         <HrAdminDashboard />

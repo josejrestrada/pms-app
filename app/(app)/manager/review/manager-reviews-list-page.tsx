@@ -4,20 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useEmployee } from "@/components/employee-provider";
 import { EmptyState, PageSkeleton } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
 import { listDirectReports } from "@/lib/employees";
 import { listReviewsForEmployees } from "@/lib/reviews";
 import type { EmployeeRow } from "@/lib/types/employee";
 import type { ReviewRow } from "@/lib/types/review";
-
-function statusLabel(status: string) {
-  if (status === "self_submitted") {
-    return "Self-appraisal submitted";
-  }
-  if (status === "completed") {
-    return "Completed";
-  }
-  return status;
-}
+import { cardFlushClassName, textLinkClassName } from "@/lib/ui";
 
 export function ManagerReviewsListPage() {
   const manager = useEmployee();
@@ -62,16 +55,14 @@ export function ManagerReviewsListPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Team Reviews</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Complete reviews after a direct report submits a self-appraisal.
-        </p>
-      </div>
+      <PageHeader
+        title="Team Reviews"
+        subtitle="Complete reviews after a direct report submits a self-appraisal."
+      />
 
       {error ? (
         <div
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
           role="alert"
         >
           {error}
@@ -92,25 +83,25 @@ export function ManagerReviewsListPage() {
           action={{ href: "/manager/goals", label: "Review team goals" }}
         />
       ) : (
-        <ul className="divide-y divide-zinc-200 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
+        <ul className={`${cardFlushClassName} divide-y divide-slate-100 dark:divide-slate-800`}>
           {reviews.map((review) => {
             const report = reportsById.get(review.employee_id);
             return (
               <li
                 key={review.id}
-                className="flex items-center justify-between gap-4 px-6 py-4"
+                className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40"
               >
                 <div>
                   <p className="font-medium">
                     {report?.full_name ?? "Unknown employee"}
                   </p>
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    {statusLabel(review.status)}
-                  </p>
+                  <div className="mt-2">
+                    <StatusBadge label={review.status} />
+                  </div>
                 </div>
                 <Link
                   href={`/manager/review/${review.id}`}
-                  className="shrink-0 text-sm font-medium text-zinc-700 underline-offset-2 hover:underline dark:text-zinc-300"
+                  className={textLinkClassName}
                 >
                   Open review
                 </Link>

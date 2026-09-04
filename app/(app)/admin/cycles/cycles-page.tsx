@@ -7,14 +7,16 @@ import type {
   ReviewCycleStatus,
 } from "@/lib/types/review-cycle";
 import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import {
+  primaryButtonClassName,
+  secondaryButtonClassName,
+  tableBodyClassName,
+  tableHeadRowClassName,
+  tableRowClassName,
+} from "@/lib/ui";
 import { CreateCycleModal } from "./create-cycle-modal";
-
-const STATUS_STYLES: Record<ReviewCycleStatus, string> = {
-  draft:
-    "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
-  open: "bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
-  closed: "bg-zinc-50 text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400",
-};
 
 function formatDate(isoDate: string) {
   const [year, month, day] = isoDate.split("-").map(Number);
@@ -95,129 +97,121 @@ export function CyclesPage() {
   return (
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Review cycles
-            </h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Only one cycle can be open at a time.
-            </p>
-          </div>
+        <PageHeader
+          title="Review cycles"
+          subtitle="Only one cycle can be open at a time."
+        />
+        <button
+          type="button"
+          className={primaryButtonClassName}
+          onClick={() => setModalOpen(true)}
+        >
+          Create cycle
+        </button>
+      </div>
+
+      {error ? (
+        <div
+          className="mt-6 rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
+          role="alert"
+        >
+          {error}
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-            onClick={() => setModalOpen(true)}
+            className="ml-3 font-medium underline"
+            onClick={() => void fetchCycles()}
           >
-            Create cycle
+            Try again
           </button>
         </div>
+      ) : null}
 
-        {error ? (
-          <div
-            className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
-            role="alert"
-          >
-            {error}
-            <button
-              type="button"
-              className="ml-3 font-medium underline"
-              onClick={() => void fetchCycles()}
-            >
-              Try again
-            </button>
-          </div>
-        ) : null}
-
-        <div className="mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              <tr>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Start</th>
-                <th className="px-4 py-3 font-medium">End</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {loading ? (
-                Array.from({ length: 4 }).map((_, index) => (
-                  <tr key={index}>
-                    {Array.from({ length: 5 }).map((__, cellIndex) => (
-                      <td key={cellIndex} className="px-4 py-3">
-                        <div className="h-4 w-24 max-w-full animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : cycles.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8">
-                    <EmptyState
-                      title="No review cycles yet"
-                      description="Create a cycle to start a performance review period for the company."
-                      action={{
-                        label: "Create cycle",
-                        onClick: () => setModalOpen(true),
-                      }}
-                    />
-                  </td>
+      <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <table className="min-w-full text-left text-sm">
+          <thead className={tableHeadRowClassName}>
+            <tr>
+              <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Start</th>
+              <th className="px-4 py-3">End</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody className={tableBodyClassName}>
+            {loading ? (
+              Array.from({ length: 4 }).map((_, index) => (
+                <tr key={index}>
+                  {Array.from({ length: 5 }).map((__, cellIndex) => (
+                    <td key={cellIndex} className="px-4 py-3">
+                      <div className="h-4 w-24 max-w-full animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                  ))}
                 </tr>
-              ) : (
-                cycles.map((cycle) => {
-                  const busy = updatingId === cycle.id;
+              ))
+            ) : cycles.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-8">
+                  <EmptyState
+                    title="No review cycles yet"
+                    description="Create a cycle to start a performance review period for the company."
+                    action={{
+                      label: "Create cycle",
+                      onClick: () => setModalOpen(true),
+                    }}
+                  />
+                </td>
+              </tr>
+            ) : (
+              cycles.map((cycle) => {
+                const busy = updatingId === cycle.id;
 
-                  return (
-                    <tr key={cycle.id}>
-                      <td className="px-4 py-3 font-medium">{cycle.name}</td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                        {formatDate(cycle.start_date)}
-                      </td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                        {formatDate(cycle.end_date)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[cycle.status]}`}
-                        >
-                          {cycle.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-2">
-                          {cycle.status !== "open" ? (
-                            <button
-                              type="button"
-                              disabled={busy}
-                              className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                              onClick={() =>
-                                void handleStatusChange(cycle, "open")
-                              }
-                            >
-                              {busy ? "Updatingâ€¦" : "Open"}
-                            </button>
-                          ) : null}
-                          {cycle.status === "open" ? (
-                            <button
-                              type="button"
-                              disabled={busy}
-                              className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                              onClick={() =>
-                                void handleStatusChange(cycle, "closed")
-                              }
-                            >
-                              {busy ? "Updatingâ€¦" : "Close"}
-                            </button>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                return (
+                  <tr key={cycle.id} className={tableRowClassName}>
+                    <td className="px-4 py-3 font-medium">{cycle.name}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
+                      {formatDate(cycle.start_date)}
+                    </td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
+                      {formatDate(cycle.end_date)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge label={cycle.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        {cycle.status !== "open" ? (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            className={`${secondaryButtonClassName} !px-2.5 !py-1 text-xs`}
+                            onClick={() =>
+                              void handleStatusChange(cycle, "open")
+                            }
+                          >
+                            {busy ? "Updating…" : "Open"}
+                          </button>
+                        ) : null}
+                        {cycle.status === "open" ? (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            className={`${secondaryButtonClassName} !px-2.5 !py-1 text-xs`}
+                            onClick={() =>
+                              void handleStatusChange(cycle, "closed")
+                            }
+                          >
+                            {busy ? "Updating…" : "Close"}
+                          </button>
+                        ) : null}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <CreateCycleModal
         open={modalOpen}

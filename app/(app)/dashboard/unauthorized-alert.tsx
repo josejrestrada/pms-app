@@ -29,7 +29,7 @@ export function UnauthorizedAlert({ show }: { show: boolean }) {
 
   return (
     <div
-      className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+      className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
       role="alert"
     >
       You are not authorized to access that page.

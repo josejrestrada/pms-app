@@ -7,15 +7,15 @@ import { getCurrentEmployee } from "@/lib/current-employee";
 
 function AccountNotSetUp() {
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
-      <header className="border-b border-zinc-200 dark:border-zinc-800">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
+    <div className="flex min-h-full flex-1 flex-col bg-slate-950 font-sans text-slate-100">
+      <header className="border-b border-slate-800 bg-slate-900/90 px-6 py-3.5 backdrop-blur-md">
+        <div className="mx-auto flex h-10 w-full max-w-6xl items-center justify-between">
           <span className="text-sm font-semibold tracking-tight">Merit</span>
-          <UserButton />
+          <UserButton appearance={{ elements: { avatarBox: "h-8 w-8" } }} />
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-6xl flex-1 items-center px-6 py-16">
-        <p className="text-lg text-zinc-700 dark:text-zinc-300">
+        <p className="text-lg text-slate-300">
           Your account is not yet set up. Please contact HR.
         </p>
       </main>
@@ -37,9 +37,11 @@ export default async function AppLayout({
 
   return (
     <EmployeeProvider employee={employee}>
-      <div className="flex min-h-full flex-1 flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
+      <div className="flex min-h-screen flex-1 flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-100 via-slate-50 to-slate-50 font-sans text-slate-900 dark:from-indigo-950 dark:via-slate-950 dark:to-slate-950 dark:text-slate-100">
         <AppNav employee={employee} />
-        <div className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">{children}</div>
+        <div className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
+          {children}
+        </div>
       </div>
     </EmployeeProvider>
   );

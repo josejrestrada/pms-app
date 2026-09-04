@@ -2,15 +2,13 @@
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { createReviewCycle } from "@/lib/review-cycles";
+import { dialogClassName, fieldClassName, primaryButtonClassName, secondaryButtonClassName } from "@/lib/ui";
 
 type CreateCycleModalProps = {
   open: boolean;
   onClose: () => void;
   onCreated: () => Promise<void> | void;
 };
-
-const fieldClassName =
-  "mt-1 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-zinc-400";
 
 function todayDateInputValue() {
   return new Date().toISOString().slice(0, 10);
@@ -80,7 +78,7 @@ export function CreateCycleModal({
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
-      className="w-[calc(100%-2rem)] max-w-md rounded-lg border border-zinc-200 bg-white p-0 text-zinc-900 shadow-lg backdrop:bg-black/40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50"
+      className={dialogClassName}
       onClose={onClose}
       onClick={(event) => {
         if (event.target === dialogRef.current) {
@@ -92,7 +90,7 @@ export function CreateCycleModal({
         <h2 id={titleId} className="text-lg font-semibold tracking-tight">
           Create cycle
         </h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           New cycles start in draft until you open them.
         </p>
 
@@ -140,7 +138,7 @@ export function CreateCycleModal({
         <div className="mt-6 flex justify-end gap-2">
           <button
             type="button"
-            className="rounded-md border border-zinc-300 px-3.5 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className={secondaryButtonClassName}
             onClick={onClose}
           >
             Cancel
@@ -148,7 +146,7 @@ export function CreateCycleModal({
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className={primaryButtonClassName}
           >
             {submitting ? "Creating…" : "Create cycle"}
           </button>

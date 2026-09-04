@@ -4,7 +4,15 @@ import { useCallback, useEffect, useState } from "react";
 import { listEmployees } from "@/lib/employees";
 import type { EmployeeRole, EmployeeWithManager } from "@/lib/types/employee";
 import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
 import { AddEmployeeModal } from "./add-employee-modal";
+import {
+  primaryButtonClassName,
+  tableBodyClassName,
+  tableHeadRowClassName,
+  tableRowClassName,
+} from "@/lib/ui";
 
 const ROLE_LABELS: Record<EmployeeRole, string> = {
   hr_admin: "HR Admin",
@@ -49,24 +57,22 @@ export function EmployeesPage() {
   return (
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Employees</h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Directory of people in the performance management system.
-            </p>
-          </div>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-            onClick={() => setModalOpen(true)}
-          >
-            Add employee
-          </button>
-        </div>
+        <PageHeader
+          title="Employees"
+          subtitle="Directory of people in the performance management system."
+        />
+        <button
+          type="button"
+          className={primaryButtonClassName}
+          onClick={() => setModalOpen(true)}
+        >
+          Add employee
+        </button>
+      </div>
 
         {error ? (
           <div
-            className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+            className="mt-6 rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
             role="alert"
           >
             {error}
@@ -80,25 +86,25 @@ export function EmployeesPage() {
           </div>
         ) : null}
 
-        <div className="mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+            <thead className={tableHeadRowClassName}>
               <tr>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Designation</th>
-                <th className="px-4 py-3 font-medium">Department</th>
-                <th className="px-4 py-3 font-medium">Manager</th>
-                <th className="px-4 py-3 font-medium">Role</th>
-                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Designation</th>
+                <th className="px-4 py-3">Department</th>
+                <th className="px-4 py-3">Manager</th>
+                <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody className={tableBodyClassName}>
               {loading ? (
                 Array.from({ length: 5 }).map((_, index) => (
                   <tr key={index}>
                     {Array.from({ length: 6 }).map((__, cellIndex) => (
                       <td key={cellIndex} className="px-4 py-3">
-                        <div className="h-4 w-24 max-w-full animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+                        <div className="h-4 w-24 max-w-full animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
                       </td>
                     ))}
                   </tr>
@@ -118,32 +124,26 @@ export function EmployeesPage() {
                 </tr>
               ) : (
                 employees.map((employee) => (
-                  <tr key={employee.id}>
+                  <tr key={employee.id} className={tableRowClassName}>
                     <td className="px-4 py-3 font-medium">
                       {employee.full_name}
                     </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       {employee.designation}
                     </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       {employee.department}
                     </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       {employee.manager?.full_name ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       {roleLabel(employee.role)}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                          employee.is_active
-                            ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
-                            : "bg-zinc-50 text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400"
-                        }`}
-                      >
-                        {employee.is_active ? "Active" : "Inactive"}
-                      </span>
+                      <StatusBadge
+                        label={employee.is_active ? "active" : "inactive"}
+                      />
                     </td>
                   </tr>
                 ))

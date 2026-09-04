@@ -12,13 +12,13 @@ import {
   listGoalRatings,
 } from "@/lib/reviews";
 import { EmptyState, PageSkeleton } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
 import type { EmployeeRow } from "@/lib/types/employee";
 import type { GoalRow } from "@/lib/types/goal";
 import type { GoalRatingRow, ReviewRow } from "@/lib/types/review";
 import type { ReviewCycleRow } from "@/lib/types/review-cycle";
-
-const fieldClassName =
-  "mt-1 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-zinc-400";
+import { cardFlushClassName, fieldClassName, primaryButtonClassName } from "@/lib/ui";
 
 const RATING_OPTIONS = [1, 2, 3, 4, 5] as const;
 
@@ -220,21 +220,17 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
 
   return (
     <div className="space-y-8">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          {cycle?.name ?? "Review"}
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-          Review {report.full_name}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {report.designation} · {review.status.replace("_", " ")}
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <PageHeader
+          title={`Review ${report.full_name}`}
+          subtitle={`${cycle?.name ?? "Review"} · ${report.designation}`}
+        />
+        <StatusBadge label={review.status} />
       </div>
 
       {error ? (
         <div
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300"
           role="alert"
         >
           {error}
@@ -267,18 +263,18 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
             return (
               <section
                 key={rating.id}
-                className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+                className={cardFlushClassName}
               >
-                <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
+                <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
                   <h2 className="text-lg font-semibold tracking-tight">
                     {goal?.title ?? "Goal"}
                   </h2>
                   {goal?.description ? (
-                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                       {goal.description}
                     </p>
                   ) : null}
-                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                     {goal?.weightage != null
                       ? `${goal.weightage}%`
                       : "No weightage"}
@@ -290,10 +286,10 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
 
                 <div className="grid gap-6 p-6 lg:grid-cols-2">
                   <div>
-                    <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                       Employee self-appraisal
                     </h3>
-                    <p className="mt-3 text-sm text-zinc-700 dark:text-zinc-300">
+                    <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">
                       {rating.self_comment || "No comment provided."}
                     </p>
                     <p className="mt-3 text-sm font-medium">
@@ -302,7 +298,7 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                       Manager evaluation
                     </h3>
                     <label className="mt-3 block text-sm font-medium">
@@ -349,18 +345,18 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
             );
           })}
 
-          <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
+          <section className={cardFlushClassName}>
+            <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
               <h2 className="text-lg font-semibold tracking-tight">
                 Overall evaluation
               </h2>
             </div>
             <div className="grid gap-6 p-6 lg:grid-cols-2">
               <div>
-                <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                   Employee self-appraisal
                 </h3>
-                <p className="mt-3 text-sm text-zinc-700 dark:text-zinc-300">
+                <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">
                   {review.self_summary || "No summary provided."}
                 </p>
                 <p className="mt-3 text-sm font-medium">
@@ -368,7 +364,7 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                   Manager evaluation
                 </h3>
                 <label className="mt-3 block text-sm font-medium">
@@ -413,7 +409,7 @@ export function ManagerReviewPage({ reviewId }: { reviewId: string }) {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className={primaryButtonClassName}
             >
               {saving ? "Saving…" : "Complete Review"}
             </button>
