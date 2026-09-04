@@ -188,7 +188,7 @@ export function CyclesPage() {
                               void handleStatusChange(cycle, "open")
                             }
                           >
-                            {busy ? "Updating…" : "Open"}
+                            {busy ? "Updating..." : "Open"}
                           </button>
                         ) : null}
                         {cycle.status === "open" ? (
@@ -200,7 +200,7 @@ export function CyclesPage() {
                               void handleStatusChange(cycle, "closed")
                             }
                           >
-                            {busy ? "Updating…" : "Close"}
+                            {busy ? "Updating..." : "Close"}
                           </button>
                         ) : null}
                       </div>
