@@ -16,6 +16,9 @@ export const cardFlushClassName =
 export const dialogClassName =
   "w-[calc(100%-2rem)] max-w-md rounded-xl border border-slate-200 bg-white p-0 text-slate-900 shadow-lg backdrop:bg-black/50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-50";
 
+export const dialogWideClassName =
+  "w-[calc(100%-2rem)] max-w-2xl rounded-xl border border-slate-200 bg-white p-0 text-slate-900 shadow-lg backdrop:bg-black/50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-50";
+
 export const tableHeadRowClassName =
   "text-xs font-semibold uppercase tracking-wider text-slate-400";
 

@@ -10,6 +10,8 @@ const TONE = {
   danger: "border-rose-500/20 bg-rose-500/10 text-rose-600 dark:text-rose-400",
   muted:
     "border-slate-500/20 bg-slate-500/10 text-slate-600 dark:text-slate-300",
+  accent:
+    "border-indigo-500/20 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
 } as const;
 
 function toneFor(label: string): keyof typeof TONE {
@@ -24,9 +26,13 @@ function toneFor(label: string): keyof typeof TONE {
     return "success";
   }
 
+  if (key === "self_submitted" || key === "self_appraisal_submitted") {
+    return "accent";
+  }
+
   if (
     key === "submitted" ||
-    key === "self_submitted" ||
+    key === "goals_submitted" ||
     key === "pending_manager_review" ||
     key.includes("manager_review")
   ) {

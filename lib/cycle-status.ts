@@ -71,3 +71,37 @@ export function hrBucket(
   }
   return "pending_self";
 }
+
+export type HrWorkflowStatus =
+  | "not_started"
+  | "goals_submitted"
+  | "self_submitted"
+  | "completed";
+
+export function hrWorkflowStatus(
+  progress: CycleProgressStatus,
+): HrWorkflowStatus {
+  switch (progress) {
+    case "completed":
+      return "completed";
+    case "manager_review_pending":
+      return "self_submitted";
+    case "goals_pending_approval":
+      return "goals_submitted";
+    default:
+      return "not_started";
+  }
+}
+
+export function hrWorkflowLabel(status: HrWorkflowStatus): string {
+  switch (status) {
+    case "completed":
+      return "completed";
+    case "self_submitted":
+      return "self_submitted";
+    case "goals_submitted":
+      return "goals_submitted";
+    default:
+      return "not_started";
+  }
+}
